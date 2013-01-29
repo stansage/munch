@@ -26,7 +26,8 @@ dd bs=440 conv=notrunc count=1 if=/usr/lib/syslinux/mbr.bin of=${usb-device}
 
 # Boot device and create persistence  
 usb_uuid="/dev/disk/by-uuid/$(lsblk -no UUID ${usb_device}1)"
-sed -i "s|label=ARCHBANG.*|device=${usb_uuid} cow_device=${usb_uuid}|" \
+# removed label?
+sed -i "s|label=|device=${usb_uuid} cow_device=${usb_uuid}|" \
     syslinux.cfg
 
 umount /mnt/{usb,iso}
