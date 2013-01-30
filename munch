@@ -23,7 +23,7 @@ iso_name='archbang-<date>.iso'
 iso_label=$(isoinfo -d -i $(iso_name) |grep "^Volume id"|awk '{print $3}')
 
 # New version
-#x=$(grep -i 'archisolabel' ${usb_syslinux}syslinux.cfg | awk '{print $2}')
+#x=$(grep -m 1 -i 'archisolabel' ${usb_syslinux}syslinux.cfg | awk '{print $2}')
 #iso_label=${x:13}
 
 
