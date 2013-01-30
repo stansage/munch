@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Munch version 0.1
+# Munch version 0.2
 # create a bootable iso with persistence
 # by Mr Green
 # 
@@ -8,14 +8,24 @@ set -e
 
 # Format your device using Fat32, Ext2/3/4 or Btrfs
 # Make sure boot flag is set.
-# Run this script in the same diredctory as iso
+# Run this script in the same directory as iso
+
+# Path to syslinux
+usb_syslinux=/mnt/usb/arch/boot/syslinux
 
 # Change to suit your device
 usb_device=/dev/sdx
+
 # Iso name is important
-iso_name='archbang-rc-*.iso'
+iso_name='archbang-<date>.iso'
+
 # Iso label requires cdrkit 
 iso_label=$(isoinfo -d -i $(iso_name) |grep "^Volume id"|awk '{print $3}')
+
+# New version
+#x=$(grep -i 'archisolabel' ${usb_syslinux}syslinux.cfg | awk '{print $2}')
+#iso_label=${x:13}
+
 
 mkdir -p /mnt/{usb,iso}
 mount -o loop ${iso_name} /mnt/iso
@@ -23,13 +33,16 @@ mount ${usb_device}1 /mnt/usb
 cp -r /mnt/iso/* /mnt/usb
 
 # Adjust syslinux and create persistence
-extlinux --install /mnt/usb/arch/boot/syslinux
+extlinux --install ${usb_syslinux}
 dd bs=440 conv=notrunc count=1 if=/usr/lib/syslinux/mbr.bin of=${usb-device}
 
 # Boot device and create persistence  
 usb_uuid="/dev/disk/by-uuid/$(lsblk -no UUID ${usb_device}1)"
 # removed label?
 sed -i "s|label=${iso_label}|device=${usb_uuid} cow_device=${usb_uuid}|" \
-    /mnt/usb/arch/boot/syslinux/syslinux.cfg
+    ${usb_syslinux}/syslinux.cfg
 
 umount /mnt/{usb,iso}
+# need to remove usb and iso directories
+# rmdir /mnt/usb
+# rmdir /mnt/iso
