@@ -28,6 +28,6 @@ dd bs=440 conv=notrunc count=1 if=/usr/lib/syslinux/mbr.bin of=${usb-device}
 usb_uuid="/dev/disk/by-uuid/$(lsblk -no UUID ${usb_device}1)"
 # removed label?
 sed -i "s|label=|device=${usb_uuid} cow_device=${usb_uuid}|" \
-    syslinux.cfg
+    /mnt/usb/arch/boot/syslinux/syslinux.cfg
 
 umount /mnt/{usb,iso}
