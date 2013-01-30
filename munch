@@ -14,6 +14,8 @@ set -e
 usb_device=/dev/sdx
 # Iso name is important
 iso_name='archbang-rc-*.iso'
+# Iso label
+iso_label='ARCHBANG'
 
 mkdir -p /mnt/{usb,iso}
 mount -o loop ${iso_name} /mnt/iso
@@ -27,7 +29,7 @@ dd bs=440 conv=notrunc count=1 if=/usr/lib/syslinux/mbr.bin of=${usb-device}
 # Boot device and create persistence  
 usb_uuid="/dev/disk/by-uuid/$(lsblk -no UUID ${usb_device}1)"
 # removed label?
-sed -i "s|label=|device=${usb_uuid} cow_device=${usb_uuid}|" \
+sed -i "s|label=$iso_label}|device=${usb_uuid} cow_device=${usb_uuid}|" \
     /mnt/usb/arch/boot/syslinux/syslinux.cfg
 
 umount /mnt/{usb,iso}
