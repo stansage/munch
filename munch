@@ -4,7 +4,7 @@
 # create a bootable iso with persistence
 # by Mr Green
 # 
-set -e
+set -o nounset
 
 # Format your device using Fat32, Ext2/3/4 or Btrfs
 # Make sure boot flag is set.
@@ -20,7 +20,7 @@ usb_device=/dev/sdx
 iso_name='archbang-<date>.iso'
 
 # Iso label requires cdrkit 
-iso_label=$(isoinfo -d -i $(iso_name) |grep "^Volume id"|awk '{print $3}')
+iso_label=$(isoinfo -d -i ${iso_name} |grep "^Volume id"|awk '{print $3}')
 
 # New version
 #x=$(grep -m 1 -i 'archisolabel' ${usb_syslinux}syslinux.cfg | awk '{print $2}')
