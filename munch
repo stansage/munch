@@ -1,25 +1,51 @@
-#!/bin/bash -x
+#!/bin/bash
 
 # Munch version 0.2
 # create a bootable iso with persistence
 # by Mr Green
 # 
-set -o nounset
 
 # Format your device using Fat32, Ext2/3/4 or Btrfs
 # Make sure boot flag is set.
 # Run this script in the same directory as iso
 
+set -o nounset
+
+
+usage()
+{
+printf "Usage: %s: [-d sdx] [-i iso_file_name] \n" $(basename $0) >&2
+exit 2
+}
+
+# test for 4 items
+[ $# -ne 4 ] && usage && exit 2
+
+# getopts
+while getopts ':d:i:' OPTION
+
+do
+	case $OPTION in
+	d)	usb_device=$OPTARG
+			;;
+	i) iso_name=$OPTARG
+      ;;
+  \?)	usage
+		;;
+	esac
+done
+
+# test args are valid
+[[ ! -b /dev/${usb_device} ]] && usage
+[[ ! -f ${iso_name} ]] && usage
+
+echo ${usb_device},${iso_name}
+
+# Testing options....
+exit
+
 # Path to syslinux
 usb_syslinux=/mnt/usb/arch/boot/syslinux
-
-# Change to suit your device
-usb_device=/dev/sdx
-#usb_device=/dev/sdc
-
-# Iso name is important
-iso_name='arch-<date>.iso'
-#iso_name='archi3-30.01.2013-x86_64.iso'
 
 # Iso label requires cdrkit 
 #iso_label=$(isoinfo -d -i ${iso_name} |grep "^Volume id"|awk '{print $3}')
