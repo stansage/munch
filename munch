@@ -14,10 +14,12 @@ set -o nounset
 usb_syslinux=/mnt/usb/arch/boot/syslinux
 
 # Change to suit your device
-usb_device=/dev/sdc
+usb_device=/dev/sdx
+#usb_device=/dev/sdc
 
 # Iso name is important
-iso_name='archi3-30.01.2013-x86_64.iso'
+iso_name='arch-<date>.iso'
+#iso_name='archi3-30.01.2013-x86_64.iso'
 
 # Iso label requires cdrkit 
 #iso_label=$(isoinfo -d -i ${iso_name} |grep "^Volume id"|awk '{print $3}')
