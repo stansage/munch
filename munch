@@ -11,37 +11,21 @@
 
 set -o nounset
 
-
 usage()
 {
-printf "Usage: %s: [-d sdx] [-i iso_file_name] \n" $(basename $0) >&2
+printf "Usage: %s: [sdx] [iso_file_name] \n" $(basename $0) >&2
 exit 2
 }
 
-# test for 4 items
-[ $# -ne 4 ] && usage && exit 2
+# test for 2 items
+[ $# -ne 2 ] && usage && exit 2
 
-# getopts
-while getopts ':d:i:' OPTION
+# Is $1 a block device?
+[[ -b /dev/${1} ]] && usb_device=${1} || usage
 
-do
-	case $OPTION in
-	d)	usb_device=$OPTARG
-			;;
-	i) iso_name=$OPTARG
-      ;;
-  \?)	usage
-		;;
-	esac
-done
+# Is $2 a valid filename?
+[[ -f ${2} ]] && iso_name=${2} || usage
 
-# test args are valid
-[[ ! -b /dev/${usb_device} ]] && usage
-[[ ! -f ${iso_name} ]] && usage
-
-echo ${usb_device},${iso_name}
-
-# Testing options....
 exit
 
 # Path to syslinux
