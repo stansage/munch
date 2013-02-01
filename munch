@@ -50,7 +50,7 @@ dd bs=440 conv=notrunc count=1 if=/usr/lib/syslinux/mbr.bin of=${usb_device}
 
 # Boot device and create persistence  
 usb_uuid="/dev/disk/by-uuid/$(lsblk -no UUID ${usb_device}1)"
-sed -i 's|label.* |device=${usb_uuid} cow_device=${usb_uuid} |' ${usb_syslinux}/syslinux.cfg
+sed -i "s|label.* |device=${usb_uuid} cow_device=${usb_uuid} |" ${usb_syslinux}/syslinux.cfg
 
 umount /mnt/{usb,iso}
 # need to remove usb and iso directories
