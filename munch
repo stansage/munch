@@ -21,10 +21,13 @@ exit 2
 [ $# -ne 2 ] && usage && exit 2
 
 # Is $1 a block device?
-[[ -b /dev/${1} ]] && usb_device=${1} || usage
+[[ -b /dev/${1} ]] && usb_device=/dev/${1} || usage
 
 # Is $2 a valid filename?
 [[ -f ${2} ]] && iso_name=${2} || usage
+
+echo $usb_device $iso_name
+
 
 # Path to syslinux
 usb_syslinux=/mnt/usb/arch/boot/syslinux
@@ -38,8 +41,8 @@ mount ${usb_device}1 /mnt/usb
 cp -r /mnt/iso/* /mnt/usb
 
 # New version might be a better way?
-x=$(grep -m 1 -i 'archisolabel' ${usb_syslinux}/syslinux.cfg | awk '{print $3}')
-iso_label=${x:13}
+#x=$(grep -m 1 -i 'archisolabel' ${usb_syslinux}/syslinux.cfg | awk '{print $3}')
+#iso_label=${x:13}
 
 # Adjust syslinux and create persistence
 extlinux --install ${usb_syslinux}
