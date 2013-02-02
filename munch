@@ -5,10 +5,6 @@
 # by Mr Green
 # 
 
-# Format your device using Fat32, Ext2/3/4 or Btrfs
-# Make sure boot flag is set.
-# Run this script in the same directory as iso
-
 set -o nounset
 
 usage()
@@ -17,7 +13,7 @@ printf "Usage: %s: [sdx] [iso_file_name] \n" $(basename $0) >&2
 exit 2
 }
 
-# test for 2 items
+# test for number of args
 [ $# -ne 2 ] && usage && exit 2
 
 # Is $1 a block device?
@@ -26,23 +22,14 @@ exit 2
 # Is $2 a valid filename?
 [[ -f ${2} ]] && iso_name=${2} || usage
 
-echo $usb_device $iso_name
-
-
 # Path to syslinux
 usb_syslinux=/mnt/usb/arch/boot/syslinux
 
-# Iso label requires cdrkit 
-#iso_label=$(isoinfo -d -i ${iso_name} |grep "^Volume id"|awk '{print $3}')
-
+# Mount,loop,copy
 mkdir -p /mnt/{usb,iso}
 mount -o loop ${iso_name} /mnt/iso
 mount ${usb_device}1 /mnt/usb
 cp -r /mnt/iso/* /mnt/usb
-
-# New version might be a better way?
-#x=$(grep -m 1 -i 'archisolabel' ${usb_syslinux}/syslinux.cfg | awk '{print $3}')
-#iso_label=${x:13}
 
 # Adjust syslinux and create persistence
 extlinux --install ${usb_syslinux}
@@ -52,7 +39,7 @@ dd bs=440 conv=notrunc count=1 if=/usr/lib/syslinux/mbr.bin of=${usb_device}
 usb_uuid="/dev/disk/by-uuid/$(lsblk -no UUID ${usb_device}1)"
 sed -i "s|label.* |device=${usb_uuid} cow_device=${usb_uuid} |" ${usb_syslinux}/syslinux.cfg
 
+# Clean up
 umount /mnt/{usb,iso}
-# need to remove usb and iso directories
 rmdir /mnt/usb
 rmdir /mnt/iso
