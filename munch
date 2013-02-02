@@ -39,6 +39,11 @@ usb_uuid="/dev/disk/by-uuid/$(lsblk -no UUID ${usb_device}1)"
 sed -i "s|label.* |device=${usb_uuid} cow_device=${usb_uuid} |" ${usb_syslinux}/syslinux.cfg
 
 # Clean up
+# possible error?
+chattr -i ${usb_syslinux}/ldlinux.sys
+# rm /boot/syslinux/ldlinux.sys
 umount /mnt/{usb,iso}
 rmdir /mnt/usb
 rmdir /mnt/iso
+
+
