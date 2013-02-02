@@ -1,7 +1,6 @@
 #!/bin/bash
-
-# Munch version 0.2
-# create a bootable iso with persistence
+#
+# Munch ... create a bootable iso with persistence
 # by Mr Green
 # 
 
