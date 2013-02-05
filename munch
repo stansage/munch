@@ -13,10 +13,25 @@ exit 2
 }
 
 # test for number of args
-[ $# -ne 2 ] && usage && exit 2
+[ $# -ne 2 ] && usage
+
+# test if $1 is a usb valid drive
+sys_path=/sys/block/${1}
+if [ -f ${sys_path}/removable ] \
+   && cat ${sys_path}/removable 2>/dev/null | grep -qF '1' \
+   && cat ${sys_path}/device/uevent 2>/dev/null | grep -qF 'DRIVER=sd'
+then
+   usb_device=/dev/${1}
+else
+	echo "${1} is not a valid usb device!"
+   usage
+	exit 2
+fi
+
+exit
 
 # Is $1 a block device?
-[[ -b /dev/${1} ]] && usb_device=/dev/${1} || usage
+#[[ -b /dev/${1} ]] && usb_device=/dev/${1} || usage
 
 # Is $2 a valid filename?
 [[ -f ${2} ]] && iso_name=${2} || usage
