@@ -28,8 +28,6 @@ else
 	exit 2
 fi
 
-exit
-
 # Is $1 a block device?
 #[[ -b /dev/${1} ]] && usb_device=/dev/${1} || usage
 
