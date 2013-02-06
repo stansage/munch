@@ -6,7 +6,7 @@ You will need a usb-drive [at least 1gb] partitioned and set up with one of the 
 
 Make sure boot flag is set
 
-Run munch with device name [sdx] and iso file name [archbang-<date>.iso]
+Run munch with device name [sdx] and iso file name [archbang-<date>-<i686/x86_64>.iso]
 
   sudo ./munch sdx archbang-<date>.iso
 
