@@ -28,9 +28,6 @@ else
 	exit 2
 fi
 
-# Is $1 a block device?
-#[[ -b /dev/${1} ]] && usb_device=/dev/${1} || usage
-
 # Is $2 a valid filename?
 [[ -f ${2} ]] && iso_name=${2} || usage
 
