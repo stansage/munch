@@ -42,7 +42,7 @@ cp -r /mnt/iso/* /mnt/usb
 
 # Adjust syslinux and create persistence
 extlinux --install ${usb_syslinux}
-dd bs=440 conv=notrunc count=1 if=/usr/lib/syslinux/mbr.bin of=${usb_device}
+dd bs=440 conv=notrunc count=1 if=/usr/lib/syslinux/bios/mbr.bin of=${usb_device}
 
 # Boot device and create persistence  
 usb_uuid="/dev/disk/by-uuid/$(lsblk -no UUID ${usb_device}1)"
