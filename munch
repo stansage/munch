@@ -2,7 +2,6 @@
 #
 # Munch ... create a bootable iso with persistence
 # by Mr Green
-# 
 
 set -o nounset
 
@@ -11,6 +10,12 @@ usage()
 printf "Usage: %s: [sdx] [iso_file_name] \n" $(basename $0) >&2
 exit 2
 }
+
+# test for root?
+if [[ ${EUID} -ne 0 ]]; then
+    echo "This script must be run as sudo/root."
+    usage
+fi
 
 # test for number of args
 [ $# -ne 2 ] && usage
@@ -32,26 +37,47 @@ fi
 [[ -f ${2} ]] && iso_name=${2} || usage
 
 # Path to syslinux
-usb_syslinux=/mnt/usb/arch/boot/syslinux
+usb_syslinux=/mnt/usb/boot/syslinux
 
 # Mount,loop,copy
-mkdir -p /mnt/{usb,iso}
+mkdir -p /mnt/{usb,iso,rootfs,root_image}
 mount -o loop ${iso_name} /mnt/iso
+if [ -d /mnt/iso/arch/i686 ] ; then
+    arch_type="i686"
+else
+    arch_type="x86_64"
+fi
+
+mount -o loop /mnt/iso/arch/${arch_type}/root-image.fs.sfs /mnt/rootfs
+mount -o loop /mnt/rootfs/root-image.fs /mnt/root_image
 mount ${usb_device}1 /mnt/usb
-cp -r /mnt/iso/* /mnt/usb
+# check for normal boot folder from iso?
+echo "Copying files to usb device, please wait ..."
+cp -r /mnt/root_image/* /mnt/usb
 
-# Adjust syslinux and create persistence
+echo
+echo "Installing boot loader to new device ..."
+# Set up syslinux booting
 extlinux --install ${usb_syslinux}
-dd bs=440 conv=notrunc count=1 if=/usr/lib/syslinux/bios/mbr.bin of=${usb_device}
-
-# Boot device and create persistence  
+dd bs=440 conv=notrunc count=1 if=/mnt/usb/usr/lib/syslinux/bios/mbr.bin of=${usb_device}
+parted ${usb_device} set 1 boot on
 usb_uuid="/dev/disk/by-uuid/$(lsblk -no UUID ${usb_device}1)"
-sed -i "s|label.* |device=${usb_uuid} cow_device=${usb_uuid} |" ${usb_syslinux}/syslinux.cfg
+cp /mnt/usb/usr/lib/syslinux/bios/* /mnt/usb/boot/syslinux
+sed -i "s|root=\/dev\/sda3 |root=${usb_uuid} |" ${usb_syslinux}/syslinux.cfg
+
 
 # Clean up
 [[ -f ${usb_syslinux}/ldlinux.sys ]] && chattr -i ${usb_syslinux}/ldlinux.sys # if file exists change its permissions
-umount /mnt/{usb,iso}
+
+# more work to be done here
+umount /mnt/{root_image,rootfs,usb,iso}
 rmdir /mnt/usb
 rmdir /mnt/iso
+rmdir /mnt/rootfs
+rmdir /mnt/root_image
 
+echo "Install Complete ..."
 
+# new problem is getting kernel to mkinitcpio or reinstall?
+# currently using pacstrap <mountpoint> linux 
+# more testing needed
