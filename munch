@@ -54,7 +54,7 @@ mount ${usb_device}1 /mnt/usb
 # check for normal boot folder from iso?
 echo "Copying files to usb device, please wait ..."
 cp -r /mnt/root_image/* /mnt/usb
-
+cp /mnt/iso/arch/boot/${arch_type}/vmlinuz /mnt/usb/boot/vmlinuz-linux
 echo
 echo "Installing boot loader to new device ..."
 # Set up syslinux booting
@@ -69,6 +69,17 @@ sed -i "s|root=\/dev\/sda3 |root=${usb_uuid} |" ${usb_syslinux}/syslinux.cfg
 # Clean up
 [[ -f ${usb_syslinux}/ldlinux.sys ]] && chattr -i ${usb_syslinux}/ldlinux.sys # if file exists change its permissions
 
+usb_chroot()
+{
+mount -t sysfs sysfs ${usb_device}/sys
+mount -t proc proc ${usb_device}/proc
+mount -o bind /dev ${usb_device}/dev
+chroot ${usb_device} "$@"
+umount -l ${usb_device}/sys ${usb_device}/proc ${usb_device}/dev
+}
+
+usb_chroot mkinitcpio -p linux
+
 # more work to be done here
 umount /mnt/{root_image,rootfs,usb,iso}
 rmdir /mnt/usb
@@ -78,6 +89,3 @@ rmdir /mnt/root_image
 
 echo "Install Complete ..."
 
-# new problem is getting kernel to mkinitcpio or reinstall?
-# currently using pacstrap <mountpoint> linux 
-# more testing needed
